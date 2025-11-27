@@ -63,58 +63,61 @@ This Worker acts as a **secure privacy buffer** between your visitors and extern
 *   **Adds safe caching and SEO headers**
 *   Ensures all image requests are served cleanly from **your domain**
 
+```text
 ┌────────────────────────┐
 │  User's Browser        │
 │  (requests image)      │
 └───────────┬────────────┘
             │
             │ 1. GET /proxy?url=<base64>
-            │   + sends Referer
+            │    + sends Referer header
             ▼
-┌────────────────────────────┐
-│ Cloudflare Worker (Proxy)  │
-└───────────┬────────────────┘
+┌────────────────────────────────┐
+│ Cloudflare Worker (Proxy)      │
+└───────────┬────────────────────┘
             │
             │ 2. Validate Referer
-            │    └─ if NOT allowed → redirect to homepage
+            │      └─ if NOT allowed → redirect to homepage
             │
             │ 3. Decode Base64 URL
-            │    └─ if invalid → redirect to homepage
+            │      └─ if invalid → redirect to homepage
             │
             │ 4. Follow up to 5 redirects manually
             ▼
-┌────────────────────────────┐
-│ External Image Server       │
-│ (actual image host)         │
-└───────────┬────────────────┘
+┌────────────────────────────────┐
+│ External Image Server          │
+│ (actual image host)            │
+└───────────┬────────────────────┘
             │
-            │ 5. Send raw response
-            │    (may include cookies, x‑headers,
-            │     tracking headers, server fingerprinting, etc.)
+            │ 5. Sends raw response:
+            │      - cookies
+            │      - tracking headers
+            │      - x-* fingerprinting
+            │      - server metadata
             ▼
-┌──────────────────────────────┐
-│ Cloudflare Worker (Sanitize) │
-└───────────┬──────────────────┘
+┌────────────────────────────────┐
+│ Cloudflare Worker (Sanitizer)  │
+└───────────┬────────────────────┘
             │
             │ 6. Strip dangerous headers:
             │      - set-cookie, set-cookie2
-            │      - x-* tracking headers
+            │      - x-* headers
             │      - server, server-timing
-            │      - nel, report-to, hsts, etc.
+            │      - nel, report-to, hsts
             │
             │ 7. Add safe headers:
             │      - Cache-Control
             │      - Link (canonical)
             │      - X-Robots-Tag
             │      - Content-Location
-            │
             ▼
-┌───────────────────────┐
+┌────────────────────────┐
 │  User's Browser        │
-│  receives clean image  │
+│  receives CLEAN image  │
 │  with:                 │
 │    - NO cookies        │
 │    - NO tracking       │
 │    - NO server info    │
 │    - GDPR-safe         │
 └────────────────────────┘
+```
