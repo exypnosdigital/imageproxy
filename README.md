@@ -64,4 +64,4 @@ This Worker acts as a **secure privacy buffer** between your visitors and extern
 *   **Removes all x‑headers and tracking headers**
 *   **Removes server fingerprinting headers**
 *   **Adds safe caching and SEO headers**
-*   Ensures all image requests are served cleanly from **your domain only**
+*   Ensures all image requests are served cleanly from **your domain**
